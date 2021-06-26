@@ -22,6 +22,5 @@ public class AwsEcsFargateCdkApp {
         serviceStack.addDependency(ddbStack);
 
         app.synth();
-
     }
 }
