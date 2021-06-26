@@ -10,7 +10,20 @@ public class AwsEcsFargateCdkApp {
     public static void main(final String[] args) {
         App app = new App();
 
-        new AwsEcsFargateCdkStack(app, "AwsEcsFargateCdkStack", StackProps.builder()
+        VpcStack vpcStack = new VpcStack(app, "Vpc");
+
+        ClusterStack clusterStack = new ClusterStack(app,"Cluster", vpcStack.getVpc());
+        clusterStack.addDependency(vpcStack);
+
+        DdbStack ddbStack = new DdbStack(app, "Ddb");
+
+        ServiceStack serviceStack = new ServiceStack(app, "Service", clusterStack.getCluster(), ddbStack.getProductEventsDdb());
+        serviceStack.addDependency(clusterStack);
+        serviceStack.addDependency(ddbStack);
+
+        app.synth();
+
+        //new AwsEcsFargateCdkStack(app, "AwsEcsFargateCdkStack", StackProps.builder()
                 // If you don't specify 'env', this stack will be environment-agnostic.
                 // Account/Region-dependent features and context lookups will not work,
                 // but a single synthesized template can be deployed anywhere.
@@ -34,8 +47,8 @@ public class AwsEcsFargateCdkApp {
                 */
 
                 // For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-                .build());
+                //.build());
 
-        app.synth();
+        //app.synth();
     }
 }
